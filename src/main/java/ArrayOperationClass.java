@@ -33,12 +33,7 @@ public class ArrayOperationClass implements ArrayOperation {
     }
 
     public int[] symmetricSubtract(int[] a, int[] b) {
-        int[] unionArray = union(a,b);
-        int[] intersectArray = intersect(a,b);
-        return Arrays.stream(unionArray)
-                .distinct()
-                .filter(x -> Arrays.stream(intersectArray).noneMatch(y -> x == y))
-                .toArray();
+        return union(subtract(a,b), subtract(b,a));
     }
 
     public void printMe(int[] arr) {
