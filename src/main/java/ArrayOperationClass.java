@@ -9,7 +9,6 @@ public class ArrayOperationClass implements ArrayOperation {
             return IntStream.range(0, a.length).allMatch(i -> a[i] == b[i]);
         }
         return false;
-
     }
 
     public int[] union(int[] a, int[] b) {
@@ -21,14 +20,12 @@ public class ArrayOperationClass implements ArrayOperation {
         return resultArray;
     }
 
-
     public int[] subtract(int[] a, int[] b) {
         return Arrays.stream(a)
                 .distinct()
                 .filter(x -> Arrays.stream(b).noneMatch(y -> x == y))
                 .toArray();
     }
-
 
     public int[] intersect(int[] a, int[] b) {
         return Arrays.stream(a)
@@ -48,13 +45,17 @@ public class ArrayOperationClass implements ArrayOperation {
 
     public void printMe(int[] arr) {
         stream(arr).forEach(el -> System.out.println(el));
-
     }
 
     public static void main(String[] args) {
         ArrayOperation operation = new ArrayOperationClass();
         int[] a = {1,2,3,4,5,6,7};
         int[] b = {1,3,4,5,8};
+        System.out.println("Array a:");
+        operation.printMe(a);
+        System.out.println("Array b:");
+        operation.printMe(b);
+        System.out.println("---------------------------------------------------");
         System.out.println("Two array equals:");
         boolean result = operation.equals(a,b);
         System.out.println(result);
@@ -75,6 +76,5 @@ public class ArrayOperationClass implements ArrayOperation {
         int [] result4 = operation.symmetricSubtract(a,b);
         operation.printMe(result4);
         System.out.println("---------------------------------------------------");
-
     }
 }
