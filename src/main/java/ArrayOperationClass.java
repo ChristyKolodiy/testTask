@@ -12,12 +12,10 @@ public class ArrayOperationClass implements ArrayOperation {
     }
 
     public int[] union(int[] a, int[] b) {
-        int maxSize = a.length + b.length;
-        int[] resultArray = new int[maxSize];
-        System.arraycopy(a, 0, resultArray, 0, a.length);
-        System.arraycopy(b, 0, resultArray, a.length, b.length);
-        resultArray = Arrays.stream(resultArray).distinct().toArray();
-        return resultArray;
+        int[][] arr = {a, b};
+        return Arrays.stream(arr)
+                .flatMapToInt(i -> Arrays.stream(i)).distinct()
+                .toArray();
     }
 
     public int[] subtract(int[] a, int[] b) {
@@ -76,5 +74,13 @@ public class ArrayOperationClass implements ArrayOperation {
         int [] result4 = operation.symmetricSubtract(a,b);
         operation.printMe(result4);
         System.out.println("---------------------------------------------------");
+
+        int[][] arr = {a, b};
+
+        int[] newArr = Arrays.stream(arr)
+                .flatMapToInt(i -> Arrays.stream(i)) //преобразовываем IntStream<int[]> в IntStream
+                .toArray(); // преобразовываем IntStream в int[]
+
+        System.out.println(Arrays.toString(newArr)); //output [1, 2, 3, 4, 5, 6]
     }
 }
