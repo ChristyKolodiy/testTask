@@ -74,13 +74,5 @@ public class ArrayOperationClass implements ArrayOperation {
         int [] result4 = operation.symmetricSubtract(a,b);
         operation.printMe(result4);
         System.out.println("---------------------------------------------------");
-
-        int[][] arr = {a, b};
-
-        int[] newArr = Arrays.stream(arr)
-                .flatMapToInt(i -> Arrays.stream(i)) //преобразовываем IntStream<int[]> в IntStream
-                .toArray(); // преобразовываем IntStream в int[]
-
-        System.out.println(Arrays.toString(newArr)); //output [1, 2, 3, 4, 5, 6]
     }
 }
