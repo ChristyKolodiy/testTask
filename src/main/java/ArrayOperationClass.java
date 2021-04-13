@@ -37,7 +37,7 @@ public class ArrayOperationClass implements ArrayOperation {
     }
 
     public void printMe(int[] arr) {
-        stream(arr).forEach(el -> System.out.println(el));
+        stream(arr).forEach(System.out::println);
     }
 
     public static void main(String[] args) {
