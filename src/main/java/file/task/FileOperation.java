@@ -13,18 +13,18 @@ import java.util.zip.ZipOutputStream;
 
 public class FileOperation {
 
-    private static final String fromFile = "/Users/consolkaaa/files/";
-    private static final String toFiles = "/Users/consolkaaa/sorted_files";
-    private static final String toDocuments = toFiles + "/Documents/";
-    private static final String toMusic = toFiles + "/Music/";
-    private static final String toPhotos = toFiles + "/Photos/";
-    private static final String toOther = toFiles + "/Other/";
-    private static final String zippedDocuments = toFiles + "/Documents.zip";
-    private static final String zippedMusic = toFiles + "/Music.zip";
-    private static final String zippedPhotos = toFiles + "/Photos.zip";
-    private static final String zippedOther = toFiles + "/Other.zip";
+    private static final String fromFileFolder = "/Users/consolkaaa/files/";
+    private static final String toSortedFolder = "/Users/consolkaaa/sorted_files";
+    private static final String toDocuments = toSortedFolder + "/Documents/";
+    private static final String toMusic = toSortedFolder + "/Music/";
+    private static final String toPhotos = toSortedFolder + "/Photos/";
+    private static final String toOther = toSortedFolder + "/Other/";
+    private static final String zippedDocuments = toSortedFolder + "/Documents.zip";
+    private static final String zippedMusic = toSortedFolder + "/Music.zip";
+    private static final String zippedPhotos = toSortedFolder + "/Photos.zip";
+    private static final String zippedOther = toSortedFolder + "/Other.zip";
 
-    private static final List<String> directories = Arrays.asList(toDocuments, toMusic, toPhotos, toOther, toFiles);
+    private static final List<String> directories = Arrays.asList(toDocuments, toMusic, toPhotos, toOther, toSortedFolder);
 
     private static void createDirectories(List<String> directories){
         directories.stream().forEach(dir -> {
@@ -38,7 +38,7 @@ public class FileOperation {
 
     private static void moveTo(List<File> filesList, String destinationPath){
         filesList.stream().forEach(file -> {
-            Path source = Paths.get(fromFile + file.getName());
+            Path source = Paths.get(fromFileFolder + file.getName());
             Path target = Paths.get(destinationPath + file.getName());
             try {
                 Files.move(source, target);
@@ -71,7 +71,7 @@ public class FileOperation {
 
         createDirectories(directories);
 
-        File folder = new File(fromFile);
+        File folder = new File(fromFileFolder);
         List<File> fileList = Arrays.asList(folder.listFiles());
         fileList.stream().forEach(file -> file.getName());
 
