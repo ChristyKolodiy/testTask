@@ -36,9 +36,9 @@ public class FileOperation {
         });
     }
 
-    private static void moveTo(List<File> filesList, String destinationPath){
+    private static void moveTo(List<File> filesList, String sourcePath, String destinationPath){
         filesList.stream().forEach(file -> {
-            Path source = Paths.get(fromFileFolder + file.getName());
+            Path source = Paths.get(sourcePath + file.getName());
             Path target = Paths.get(destinationPath + file.getName());
             try {
                 Files.move(source, target);
@@ -86,16 +86,16 @@ public class FileOperation {
             List<File> files = sortFilesIntoFolders(predicate, fileList);
 
             if(predicate == belongsToDocuments) {
-                moveTo(files, toDocuments);
+                moveTo(files, fromFileFolder, toDocuments);
             } else if (predicate == belongsToPhotos){
-                moveTo(files, toPhotos);
+                moveTo(files, fromFileFolder, toPhotos);
             } else if (predicate == belongsToMusic){
-                moveTo(files, toMusic);
+                moveTo(files, fromFileFolder, toMusic);
             }
         });
 
         List<File> otherFiles = Arrays.asList(folder.listFiles());
-        moveTo(otherFiles, toOther);
+        moveTo(otherFiles, fromFileFolder, toOther);
 
         zipFolder(Paths.get(toDocuments), Paths.get(zippedDocuments));
         zipFolder(Paths.get(toPhotos), Paths.get(zippedPhotos));
