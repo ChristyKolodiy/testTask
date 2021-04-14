@@ -25,8 +25,6 @@ public class FileOperation {
     private static final String zippedOther = toFiles + "/Other.zip";
 
     private static final List<String> directories = Arrays.asList(toDocuments, toMusic, toPhotos, toOther, toFiles);
-    private static final List<String> zippedDirectories = Arrays.asList(zippedDocuments, zippedPhotos, zippedPhotos, zippedOther);
-    private static final List<String> otherCategory = new ArrayList<>();
 
     private static void createDirectories(List<String> directories){
         directories.stream().forEach(dir -> {
@@ -81,15 +79,10 @@ public class FileOperation {
         Predicate<File> belongsToPhotos = file -> file.getName().endsWith(".jpg") || file.getName().endsWith(".jpeg")
                 || file.getName().endsWith(".png");
         Predicate<File> belongsToMusic = file -> file.getName().endsWith(".mp3") || file.getName().endsWith(".wav");
-        Predicate<File> belongsToOther = file -> file.getName().endsWith(".mp3") && file.getName().endsWith(".wav")
-                && file.getName().endsWith(".txt") && file.getName().endsWith(".docx") && file.getName().endsWith(".jpg")
-                && file.getName().endsWith(".jpeg")
-                && file.getName().endsWith(".png");
 
         List<Predicate> predicateList = Arrays.asList(belongsToDocuments, belongsToPhotos, belongsToMusic);
 
         predicateList.stream().forEach(predicate -> {
-
             List<File> files = sortFilesIntoFolders(predicate, fileList);
 
             if(predicate == belongsToDocuments) {
