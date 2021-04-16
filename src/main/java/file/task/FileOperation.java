@@ -23,10 +23,15 @@ public class FileOperation {
     private static final String SLASH = "/";
     private static final String ZIP = ".zip";
 
-    private static final List<String> directories = Arrays.asList(toSortedFolder, toDocuments, toMusic, toPhotos, toOther);
-    private static final Logger logger = Logger.getLogger(FileOperation.class.getName());
+    private static File folder = new File(fromFileFolder);
+    private static Logger logger = Logger.getLogger(FileOperation.class.getName());
 
-    private static void createDirectories(List<String> directories){
+    private static Predicate<File> belongsToDocuments = belongsToCategory(Multimedia.TXT, Multimedia.DOC, Multimedia.DOCX);
+    private static Predicate<File> belongsToPhotos = belongsToCategory(Multimedia.JPG, Multimedia.JPEG, Multimedia.PNG);
+    private static Predicate<File> belongsToMusic = belongsToCategory(Multimedia.MP3, Multimedia.WAV, Multimedia.MP4);
+
+    private static void createDirectories(List<String> directories) throws IOException{
+        Files.createDirectories(Paths.get(toSortedFolder));
         directories.stream().forEach(dir -> {
             try {
                 Files.createDirectories(Paths.get(dir));
@@ -49,10 +54,22 @@ public class FileOperation {
         });
     }
 
-    private static List<File> sortFilesIntoFolders(Predicate<File> category, List<File> fileList){
-        return fileList.stream()
-                .filter(category)
-                .collect(Collectors.toList());
+    private static void sortFilesIntoFolders(List<Predicate<File>> categoryList, List<File> files){
+        categoryList.stream().forEach(predicate -> {
+            List<File> sortedFiles = files.stream().filter(predicate)
+                    .collect(Collectors.toList());
+
+            if(predicate == belongsToDocuments) {
+                moveTo(sortedFiles, fromFileFolder, toDocuments);
+            } else if (predicate == belongsToPhotos){
+                moveTo(sortedFiles, fromFileFolder, toPhotos);
+            } else if (predicate == belongsToMusic){
+                moveTo(sortedFiles, fromFileFolder, toMusic);
+            }
+        });
+
+        List<File> otherFiles = Arrays.asList(folder.listFiles());
+        moveTo(otherFiles, fromFileFolder, toOther);
     }
 
     private static void zipFolder(Path sourceFolderPath, Path zipPath) throws Exception {
@@ -68,6 +85,16 @@ public class FileOperation {
         zos.close();
     }
 
+    private static void zipDirectoriesList(List<String> directories){
+        directories.stream().forEach(dir -> {
+            try {
+                zipFolder(Paths.get(dir), Paths.get(dir + ZIP));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     private static Predicate<File> belongsToCategory(Multimedia media1, Multimedia media2, Multimedia media3) {
         return file -> file.getName().endsWith(media1.getValue())
                 || file.getName().endsWith(media2.getValue())
@@ -76,37 +103,16 @@ public class FileOperation {
 
     public static void main(String[] args) throws Exception {
 
+        List<String> directories = Arrays.asList(toDocuments, toMusic, toPhotos, toOther);
         createDirectories(directories);
 
-        File folder = new File(fromFileFolder);
         List<File> fileList = Arrays.asList(folder.listFiles());
         fileList.stream().forEach(file -> file.getName());
 
-        Predicate<File> belongsToDocuments = belongsToCategory(Multimedia.TXT, Multimedia.DOC, Multimedia.DOCX);
-        Predicate<File> belongsToPhotos = belongsToCategory(Multimedia.JPG, Multimedia.JPEG, Multimedia.PNG);
-        Predicate<File> belongsToMusic = belongsToCategory(Multimedia.MP3, Multimedia.WAV, Multimedia.MP4);
+        List<Predicate<File>> categoryList = Arrays.asList(belongsToDocuments, belongsToPhotos, belongsToMusic);
+        sortFilesIntoFolders(categoryList, fileList);
 
-        List<Predicate> predicateList = Arrays.asList(belongsToDocuments, belongsToPhotos, belongsToMusic);
-
-        predicateList.stream().forEach(predicate -> {
-            List<File> files = sortFilesIntoFolders(predicate, fileList);
-
-            if(predicate == belongsToDocuments) {
-                moveTo(files, fromFileFolder, toDocuments);
-            } else if (predicate == belongsToPhotos){
-                moveTo(files, fromFileFolder, toPhotos);
-            } else if (predicate == belongsToMusic){
-                moveTo(files, fromFileFolder, toMusic);
-            }
-        });
-
-        List<File> otherFiles = Arrays.asList(folder.listFiles());
-        moveTo(otherFiles, fromFileFolder, toOther);
-
-        zipFolder(Paths.get(toDocuments), Paths.get(toDocuments + ZIP));
-        zipFolder(Paths.get(toPhotos), Paths.get(toPhotos + ZIP));
-        zipFolder(Paths.get(toMusic), Paths.get(toMusic + ZIP));
-        zipFolder(Paths.get(toOther), Paths.get(toOther + ZIP));
+        zipDirectoriesList(directories);
 
     }
 }
