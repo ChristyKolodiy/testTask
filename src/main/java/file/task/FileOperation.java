@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -15,23 +16,22 @@ public class FileOperation {
 
     private static final String fromFileFolder = "/Users/consolkaaa/files/";
     private static final String toSortedFolder = "/Users/consolkaaa/sorted_files";
-    private static final String toDocuments = toSortedFolder + "/Documents/";
-    private static final String toMusic = toSortedFolder + "/Music/";
-    private static final String toPhotos = toSortedFolder + "/Photos/";
-    private static final String toOther = toSortedFolder + "/Other/";
-    private static final String zippedDocuments = toSortedFolder + "/Documents.zip";
-    private static final String zippedMusic = toSortedFolder + "/Music.zip";
-    private static final String zippedPhotos = toSortedFolder + "/Photos.zip";
-    private static final String zippedOther = toSortedFolder + "/Other.zip";
+    private static final String toDocuments = toSortedFolder + "/Documents";
+    private static final String toMusic = toSortedFolder + "/Music";
+    private static final String toPhotos = toSortedFolder + "/Photos";
+    private static final String toOther = toSortedFolder + "/Other";
+    private static final String SLASH = "/";
+    private static final String ZIP = ".zip";
 
-    private static final List<String> directories = Arrays.asList(toDocuments, toMusic, toPhotos, toOther, toSortedFolder);
+    private static final List<String> directories = Arrays.asList(toSortedFolder, toDocuments, toMusic, toPhotos, toOther);
+    private static final Logger logger = Logger.getLogger(FileOperation.class.getName());
 
     private static void createDirectories(List<String> directories){
         directories.stream().forEach(dir -> {
             try {
                 Files.createDirectories(Paths.get(dir));
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.info("Directory " + dir + "couldn't be created.");
             }
         });
     }
@@ -39,11 +39,12 @@ public class FileOperation {
     private static void moveTo(List<File> filesList, String sourcePath, String destinationPath){
         filesList.stream().forEach(file -> {
             Path source = Paths.get(sourcePath + file.getName());
-            Path target = Paths.get(destinationPath + file.getName());
+            Path target = Paths.get(destinationPath + SLASH + file.getName());
             try {
                 Files.move(source, target);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.info("Moving files to " + destinationPath + "couldn't be done. File"
+                        + file.getName() + "already exists.");
             }
         });
     }
@@ -67,6 +68,12 @@ public class FileOperation {
         zos.close();
     }
 
+    private static Predicate<File> belongsToCategory(Multimedia media1, Multimedia media2, Multimedia media3) {
+        return file -> file.getName().endsWith(media1.getValue())
+                || file.getName().endsWith(media2.getValue())
+                || file.getName().endsWith(media3.getValue());
+    }
+
     public static void main(String[] args) throws Exception {
 
         createDirectories(directories);
@@ -75,10 +82,9 @@ public class FileOperation {
         List<File> fileList = Arrays.asList(folder.listFiles());
         fileList.stream().forEach(file -> file.getName());
 
-        Predicate<File> belongsToDocuments = file -> file.getName().endsWith(".txt") || file.getName().endsWith(".docx");
-        Predicate<File> belongsToPhotos = file -> file.getName().endsWith(".jpg") || file.getName().endsWith(".jpeg")
-                || file.getName().endsWith(".png");
-        Predicate<File> belongsToMusic = file -> file.getName().endsWith(".mp3") || file.getName().endsWith(".wav");
+        Predicate<File> belongsToDocuments = belongsToCategory(Multimedia.TXT, Multimedia.DOC, Multimedia.DOCX);
+        Predicate<File> belongsToPhotos = belongsToCategory(Multimedia.JPG, Multimedia.JPEG, Multimedia.PNG);
+        Predicate<File> belongsToMusic = belongsToCategory(Multimedia.MP3, Multimedia.WAV, Multimedia.MP4);
 
         List<Predicate> predicateList = Arrays.asList(belongsToDocuments, belongsToPhotos, belongsToMusic);
 
@@ -97,10 +103,10 @@ public class FileOperation {
         List<File> otherFiles = Arrays.asList(folder.listFiles());
         moveTo(otherFiles, fromFileFolder, toOther);
 
-        zipFolder(Paths.get(toDocuments), Paths.get(zippedDocuments));
-        zipFolder(Paths.get(toPhotos), Paths.get(zippedPhotos));
-        zipFolder(Paths.get(toMusic), Paths.get(zippedMusic));
-        zipFolder(Paths.get(toOther), Paths.get(zippedOther));
+        zipFolder(Paths.get(toDocuments), Paths.get(toDocuments + ZIP));
+        zipFolder(Paths.get(toPhotos), Paths.get(toPhotos + ZIP));
+        zipFolder(Paths.get(toMusic), Paths.get(toMusic + ZIP));
+        zipFolder(Paths.get(toOther), Paths.get(toOther + ZIP));
 
     }
 }
